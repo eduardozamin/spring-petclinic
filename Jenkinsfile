@@ -2,15 +2,16 @@ node {
     def mvnHome
     mvnHome = tool 'MVN 3.3'
     env.JAVA_HOME = tool 'Java 8'
-   
+
    stage('Preparation') { // for display purposes
         git 'https://github.com/spring-projects/spring-petclinic.git'
+        sh "env | sort"
    }
- 
+
    stage('Build') {
       sh "'${mvnHome}/bin/mvn' install -Dmaven.test.skip=true"
    }
- 
+
    stage('Test') {
        parallel (
            "test":     {
@@ -31,7 +32,7 @@ node {
       step([$class: 'PmdPublisher', pattern: '**/target/pmd.xml', unstableTotalAll:'0'])
       archive 'target/*.jar'
    }
-    
+
    stage('Deploy') {
       sleep 10
       echo "PerClinic deployed"
